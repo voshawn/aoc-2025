@@ -8,42 +8,32 @@ const turns = input.split("\n");
 let position = 50;
 let countZeroes = 0;
 
-const parseTurn = (turn) => {
-    if (turn.startsWith("L")) {
-        return parseInt(turn.slice(1)) * -1;
-    } else {
-        return parseInt(turn.slice(1));
-    }
-}
-
 turns.forEach((turn) => {
-    const turnValue = parseTurn(turn);
-    console.log("turnValue", turnValue);
-    let newPosition = (position + turnValue) % 100;
-    if (newPosition < 0) {
-        newPosition = 100 + newPosition;
-    }
-    console.log("newPosition", newPosition);
-    // count zeros
-    if (newPosition === 0) {
-        countZeroes = countZeroes + 1;
-        console.log("zero added", 1);
-    }
-    // Count full rotations
-    const fullRotations = Math.trunc((position + turnValue) / 100);
-    if (Math.abs(fullRotations) > 0 && newPosition !== 0) {
-        countZeroes = countZeroes + Math.abs(fullRotations);
-        console.log("fullRotations added", fullRotations);
-    }
+    // Determine direction (1 for Right, -1 for Left)
+    // and the distance (magnitude)
+    const direction = turn.startsWith("R") ? 1 : -1;
+    const distance = parseInt(turn.slice(1));
 
-    // Count backward rotations pass zero
-    const backRotation = position + turnValue
-    if (backRotation < 0 && position !== 0) {
-        countZeroes = countZeroes + 1;
-        console.log("backRotation added", 1);
+    // SIMULATION LOOP
+    // Instead of doing math, we physically tick the dial one step at a time
+    for (let i = 0; i < distance; i++) {
+        position += direction;
+
+        // Handle wrapping
+        // If we go above 99, wrap to 0
+        if (position > 99) {
+            position = 0;
+        }
+        // If we go below 0, wrap to 99
+        else if (position < 0) {
+            position = 99;
+        }
+
+        // CHECK: Did this specific click make us look at 0?
+        if (position === 0) {
+            countZeroes++;
+        }
     }
-    position = newPosition;
 });
 
-console.log("total countZeroes", countZeroes);
-
+console.log("Total Zeroes:", countZeroes);
